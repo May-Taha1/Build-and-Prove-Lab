@@ -1,0 +1,279 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Build and Prove Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* Layout: bold tab bar over one working panel per station; chunky bordered cards, projector-friendly size. */
+:root{
+  --navy:#1B1F4B; --ink2:#4A4F7A; --bg:#F3F8FF; --card:#FFFFFF;
+  --coral:#FF5D73; --teal:#12B5A5; --violet:#7A5CFF; --yellow:#FFC93C; --blue:#2F9BFF; --green:#5FB41E;
+  --coral-t:#FFE3E7; --teal-t:#D5F5F1; --violet-t:#E8E2FF; --yellow-t:#FFF2C7; --blue-t:#DCEDFF; --green-t:#E8F7D4;
+  --font:'Nunito','Segoe UI',Arial,sans-serif; --r:14px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--navy);font-family:var(--font);font-size:17px;line-height:1.45;margin:0;
+  padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1040px;margin:0 auto}
+header.top{padding:22px 0 10px;display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+h1{font-size:clamp(26px,4.4vw,40px);line-height:1.05;margin:0;font-weight:900;letter-spacing:-.01em}
+.sub{color:var(--ink2);margin:6px 0 0;font-weight:700}
+.badge{background:var(--yellow);border:2px solid var(--navy);border-radius:999px;padding:4px 14px;font-weight:900;font-size:13px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+nav.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 18px}
+nav.tabs button{font:inherit;text-align:left;cursor:pointer;background:var(--card);border:2px solid var(--navy);border-radius:var(--r);padding:10px 12px;color:var(--navy);box-shadow:0 4px 0 var(--navy);min-width:0}
+nav.tabs button b{display:block;font-size:17px;font-weight:900}
+nav.tabs button span{display:block;font-size:13px;color:var(--ink2);font-weight:700}
+nav.tabs button[aria-selected=true]{background:var(--tabc,var(--blue));color:#fff;transform:translateY(2px);box-shadow:0 2px 0 var(--navy)}
+nav.tabs button[aria-selected=true] span{color:#fff}
+nav.tabs button:focus-visible,.btn:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible,.opt:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:2px solid var(--navy);border-radius:var(--r);padding:16px 18px;margin:0 0 16px}
+.card h2{margin:0 0 6px;font-size:22px;font-weight:900}
+.card h3{margin:0 0 6px;font-size:18px;font-weight:900}
+.mission{background:var(--yellow-t);border-color:var(--navy)}
+.lead{color:var(--ink2);font-weight:700;margin:0 0 10px}
+.btn{font:inherit;font-weight:900;border:2px solid var(--navy);border-radius:12px;background:var(--yellow);color:var(--navy);padding:9px 18px;cursor:pointer;box-shadow:0 4px 0 var(--navy)}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--navy)}
+.btn.alt{background:var(--card)}.btn.go{background:var(--green);color:#fff}.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.chain{display:flex;gap:6px;align-items:stretch;flex-wrap:wrap;margin:8px 0}
+.node{flex:1 1 130px;min-width:0;border:2px solid var(--navy);border-radius:12px;padding:8px 10px;background:var(--blue-t);font-weight:800;font-size:15px;transition:.25s}
+.node small{display:block;font-weight:700;color:var(--ink2);font-size:12.5px}
+.node.hit{background:var(--coral);color:#fff}.node.hit small{color:#fff}
+.node.ok{background:var(--green-t)}.node.bad{background:var(--coral-t)}
+.arrow{align-self:center;font-weight:900;font-size:22px}
+.slot{flex:1 1 140px;min-height:74px;border:2px dashed var(--navy);border-radius:12px;padding:8px;background:#fff;cursor:pointer;font-weight:800;font-size:15px;min-width:0}
+.slot i{display:block;font-style:normal;font-size:12px;color:var(--ink2);font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.slot.f{border-style:solid;background:var(--blue-t)}.slot.good{background:var(--green-t)}.slot.wrong{background:var(--coral-t)}
+.opts{display:grid;gap:8px;margin:8px 0}
+.opt{font:inherit;text-align:left;cursor:pointer;background:#fff;border:2px solid var(--navy);border-radius:12px;padding:9px 12px;color:var(--navy);font-weight:700;min-width:0}
+.opt:hover{background:var(--blue-t)}.opt.sel{background:var(--violet-t);border-color:var(--violet);box-shadow:inset 0 0 0 2px var(--violet)}
+.opt.good{background:var(--green-t);border-color:var(--green)}.opt.wrong{background:var(--coral-t);border-color:var(--coral)}
+.fb{border-radius:12px;padding:10px 14px;font-weight:700;margin-top:10px;border:2px solid var(--navy)}
+.fb.good{background:var(--green-t)}.fb.bad{background:var(--coral-t)}.fb.info{background:var(--blue-t)}
+.tag{display:inline-block;border:2px solid var(--navy);border-radius:999px;padding:1px 10px;font-size:12px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;background:var(--violet-t)}
+.tag.red{background:var(--coral-t)}.tag.green{background:var(--green-t)}.tag.y{background:var(--yellow-t)}
+table.log{border-collapse:collapse;width:100%;font-size:14.5px}
+table.log th,table.log td{border:2px solid var(--navy);padding:6px 8px;text-align:left;vertical-align:top}
+table.log th{background:var(--blue-t);font-weight:900}
+.tw{overflow-x:auto}
+select,textarea,input[type=text]{font:inherit;font-weight:700;border:2px solid var(--navy);border-radius:10px;padding:8px 10px;background:#fff;color:var(--navy);max-width:100%}
+textarea{width:100%;min-height:90px}
+select{min-width:0;width:100%}
+label.lbl{display:block;font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);margin:8px 0 3px}
+.dots{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:6px 0}
+.dots span{border:2px solid var(--navy);border-radius:6px;text-align:center;font-weight:900;padding:4px 0;font-size:14px;background:var(--green-t)}
+.dots span.x{background:var(--coral-t)}
+.big{font-size:32px;font-weight:900;line-height:1}
+.bar{height:20px;border:2px solid var(--navy);border-radius:10px;background:#fff;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:var(--blue);transition:width .6s}
+.score{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0}
+.score div{border:2px solid var(--navy);border-radius:12px;padding:6px 12px;background:var(--yellow-t);font-weight:900}
+.chk{list-style:none;padding:0;margin:8px 0}.chk li{padding:3px 0;font-weight:800}
+.chk li::before{content:"○ ";color:var(--ink2)}.chk li.y::before{content:"✔ ";color:var(--green)}
+.note{font-size:14px;color:var(--ink2);font-weight:700}
+footer{margin-top:24px;color:var(--ink2);font-size:14px;font-weight:700}
+@media(max-width:720px){nav.tabs{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}.arrow{display:none}body{font-size:16px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="wrap">
+<header class="top"><div><h1>Build and Prove Lab</h1><p class="sub">Grade 10 AI · Week 11 · Assemble it, test it, lock it</p></div><span class="badge">Week 11 · Lab</span></header>
+<nav class="tabs" role="tablist" aria-label="Lab stations"><button role="tab" data-tab="h1" aria-selected="false" style="--tabc:var(--coral)"><b>H1 Assemble</b><span>Order the chain</span></button><button role="tab" data-tab="h2" aria-selected="false" style="--tabc:var(--teal)"><b>H2 Test bench</b><span>Hunt edge cases</span></button><button role="tab" data-tab="h3" aria-selected="false" style="--tabc:var(--violet)"><b>H3 One change</b><span>Trace and measure</span></button><button role="tab" data-tab="h4" aria-selected="false" style="--tabc:var(--blue)"><b>H4 Lock & defend</b><span>Regression + panel</span></button></nav>
+<section class="panel" id="h1" role="tabpanel">
+ <div class="card mission"><h2>H1 · Assemble the chain</h2><p class="lead">Mission: build the Canteen Share Helper so every hand-off works, from data to output. Tap a card to place it in the next slot. Tap a filled slot to take it out.</p></div>
+ <div class="card"><h3>1 · Put the parts in order</h3>
+  <div class="chain" id="h1slots"></div>
+  <p class="note">Pick from the parts:</p><div class="opts" id="h1pool" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr))"></div>
+  <div class="row"><button class="btn go" id="h1check">Check my chain</button><button class="btn alt" id="h1reset">Start again</button></div>
+  <div id="h1fb" class="fb" hidden></div></div>
+ <div class="card"><h3>2 · Fix the weakest hand-off</h3>
+  <p class="lead">A hand-off is where one step's output becomes the next step's input. Step 1 prints a long paragraph. Step 2 expects one line per item. Which hand-off is broken, and what is the one-connection fix?</p>
+  <div class="chain"><div class="node">DATA<small>list of items</small></div><span class="arrow">→</span><div class="node">STEP 1<small>sort prompt</small></div><span class="arrow">→</span><div class="node">STEP 2<small>note tool</small></div><span class="arrow">→</span><div class="node">OUTPUT<small>share list + note</small></div></div>
+  <label class="lbl" for="h1ho">Broken hand-off</label>
+  <select id="h1ho"><option value="">Choose…</option><option value="a">Data → Step 1</option><option value="b">Step 1 → Step 2</option><option value="c">Step 2 → Output</option></select>
+  <div class="opts" id="h1fix"></div>
+  <div class="row"><button class="btn go" id="h1fixbtn">Check my fix</button></div><div id="h1fb2" class="fb" hidden></div></div>
+ <div class="card"><div class="row"><button class="btn" id="h1copy">Copy my answers</button></div></div>
+</section>
+<section class="panel" id="h2" role="tabpanel">
+ <div class="card mission"><h2>H2 · Test bench: hunt the edge cases</h2><p class="lead">Mission: run 8 tests, judge each output against the criteria and the governance rules, and log it. Criteria: accurate sort · no personal data · nothing invented · nothing silently dropped.</p></div>
+ <div class="card"><div class="row" style="justify-content:space-between"><h3 id="h2head">Test 1 of 8</h3><div class="score"><div id="h2pts">Points 0</div></div></div>
+  <div id="h2stage"></div></div>
+ <div class="card"><h3>Evaluation log</h3><div class="tw"><table class="log" id="h2log"><thead><tr><th>#</th><th>Input type</th><th>Output (short)</th><th>You said</th><th>Component to change</th><th>Check</th></tr></thead><tbody></tbody></table></div></div>
+ <div class="card" id="h2end" hidden><h3>Your fallback</h3><p class="lead">The blank list invented food. Which fallback sentence is graceful?</p><div class="opts" id="h2fall"></div><div id="h2fb" class="fb" hidden></div><div class="row"><button class="btn" id="h2copy">Copy my answers</button></div></div>
+</section>
+<section class="panel" id="h3" role="tabpanel">
+ <div class="card mission"><h2>H3 · One change, traced</h2><p class="lead">Mission: pick ONE change, predict which parts it will reach, then run it and measure the result on the 10 held-out lists. Accuracy = correct ÷ total. Gain = after − before, in percentage points (pp).</p></div>
+ <div class="card"><h3>Before the change</h3><div class="chain" id="h3chain"></div><div class="dots" id="h3before"></div><p><b id="h3b">7 of 10 = 70%</b> on the held-out lists</p></div>
+ <div class="card"><h3>1 · Choose one change</h3><div class="opts" id="h3opts"></div>
+  <h3 style="margin-top:12px">2 · Predict: which parts will it reach?</h3><div class="row" id="h3pred"></div>
+  <div class="row" style="margin-top:10px"><button class="btn go" id="h3run" disabled>Run it</button></div></div>
+ <div class="card" id="h3res" hidden><h3>Result</h3><div class="chain" id="h3chain2"></div><div class="dots" id="h3after"></div><div class="grid3"><div><span class="note">Before</span><div class="big" id="h3rb">70%</div></div><div><span class="note">After</span><div class="big" id="h3ra"></div></div><div><span class="note">Change</span><div class="big" id="h3rg"></div></div></div><div id="h3fb" class="fb info"></div><div class="row" style="margin-top:10px"><button class="btn" id="h3copy">Copy my answers</button></div></div>
+</section>
+<section class="panel" id="h4" role="tabpanel">
+ <div class="card mission"><h2>H4 · Lock it and defend it</h2><p class="lead">Mission: run the regression check, lock one version, then defend it to the panel with named checks.</p></div>
+ <div class="card"><h3>1 · Regression check</h3><p class="lead">Version 2 adds a last-minute feature: a thank-you note that uses each student's name. Compare the two versions.</p>
+  <div class="tw"><table class="log" id="h4tab"></table></div>
+  <div class="opts" style="grid-template-columns:1fr 1fr"><button class="opt" data-lock="1">Lock Version 1</button><button class="opt" data-lock="2">Lock Version 2</button></div><div id="h4fb" class="fb" hidden></div></div>
+ <div class="card"><h3>2 · The panel asks…</h3><div id="h4q"></div><div class="score"><div id="h4sc">Defence 0 / 3</div></div></div>
+ <div class="card"><h3>3 · Your 20-second defence</h3><p class="lead">Write it in your own words. Aim to tick all four boxes.</p>
+  <textarea id="h4txt" placeholder="I know it works because… I checked… I would catch a mistake by…"></textarea>
+  <ul class="chk" id="h4chk"><li data-k="num">Includes a number from a test (for example 9 of 10 or 90%)</li><li data-k="chk">Names a check you ran (verified, tested, checked)</li><li data-k="gov">Names a rule or oversight (rule, privacy, human, risk)</li><li data-k="len">Long enough to be a real defence (25 words or more)</li></ul>
+  <div class="row"><button class="btn" id="h4copy">Copy my answers</button></div></div>
+</section>
+
+<footer>Made-up examples only. No names, faces or personal details. Nothing you type here is saved or sent anywhere. Use “Copy my answers” and paste into your worksheet.</footer>
+</div>
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+const initDone={};
+function show(id,push){
+  if(!/^h[1-4]$/.test(id)) id='h1';
+  $$('[role=tab]').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===id));
+  $$('.panel').forEach(p=>p.classList.toggle('on',p.id===id));
+  if(!initDone[id]&&window['init_'+id]){initDone[id]=1;window['init_'+id]()}
+  if(push!==false&&location.hash!=='#'+id){try{history.replaceState(null,'','#'+id)}catch(e){location.hash=id}}
+}
+$$('[role=tab]').forEach(t=>t.addEventListener('click',()=>show(t.dataset.tab)));
+window.addEventListener('hashchange',()=>show(location.hash.slice(1),false));
+function copyText(txt,btn){
+  const done=()=>{const o=btn.textContent;btn.textContent='Copied ✔';setTimeout(()=>btn.textContent=o,1600)};
+  const fb=()=>{let ta=btn.parentElement.querySelector('textarea.cp');if(!ta){ta=document.createElement('textarea');ta.className='cp';ta.readOnly=true;btn.parentElement.appendChild(ta)}ta.value=txt;ta.style.width='100%';ta.select()};
+  try{navigator.clipboard.writeText(txt).then(done).catch(fb)}catch(e){fb()}
+}
+function fbox(id,cls,html){const e=$('#'+id);e.className='fb '+cls;e.innerHTML=html;e.hidden=false}
+</script>
+<script>
+const R={};
+/* H1 */
+const H1C=[{id:'x',tag:'DATA?',txt:'A list with students’ names and photos',slot:-1},{id:'p1',tag:'STEP 1',txt:'Sort prompt: label each item Keep, Share today or Bin',slot:1},{id:'o',tag:'OUTPUT',txt:'Share list + note, approved by a staff member',slot:3},{id:'d',tag:'DATA',txt:'Made-up leftover list (10 items)',slot:0},{id:'t2',tag:'STEP 2',txt:'Note tool: draft a pickup note for the charity',slot:2}];
+let h1s=[null,null,null,null];
+const H1LAB=['1 · Data','2 · Step 1','3 · Step 2','4 · Output'];
+function h1draw(){
+  $('#h1slots').innerHTML=h1s.map((id,i)=>{const c=H1C.find(c=>c.id===id);return (i?'<span class="arrow">→</span>':'')+`<div class="slot ${c?'f':''}" data-i="${i}" role="button" tabindex="0"><i>${H1LAB[i]}</i>${c?esc(c.txt):'<span class="note">empty</span>'}</div>`}).join('');
+  $('#h1pool').innerHTML=H1C.filter(c=>!h1s.includes(c.id)).map(c=>`<button class="opt" data-id="${c.id}"><span class="tag">${c.tag}</span><br>${esc(c.txt)}</button>`).join('');
+}
+function init_h1(){
+  h1draw();
+  $('#h1pool').addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(!b)return;const i=h1s.indexOf(null);if(i<0)return;h1s[i]=b.dataset.id;$('#h1fb').hidden=true;h1draw()});
+  $('#h1slots').addEventListener('click',e=>{const s=e.target.closest('[data-i]');if(!s)return;h1s[+s.dataset.i]=null;$('#h1fb').hidden=true;h1draw()});
+  $('#h1reset').onclick=()=>{h1s=[null,null,null,null];$('#h1fb').hidden=true;h1draw()};
+  $('#h1check').onclick=()=>{
+    if(h1s.includes(null)){fbox('h1fb','info','Fill all four slots first.');return}
+    const slots=$$('#h1slots .slot');let ok=0;
+    h1s.forEach((id,i)=>{const c=H1C.find(c=>c.id===id);const g=c.slot===i;if(g)ok++;slots[i].classList.add(g?'good':'wrong')});
+    R.h1a=ok;
+    if(h1s.includes('x'))fbox('h1fb','bad',`Governance rule: no names, faces or personal details in any data. Swap the list with names for the made-up list. ${ok} of 4 slots correct.`);
+    else if(ok===4)fbox('h1fb','good','All four slots are right: data → Step 1 → Step 2 → output. Each output feeds the next input.');
+    else fbox('h1fb','bad',`${ok} of 4 slots are right. Follow the data: what must happen before the note can be written?`);
+  };
+  const fixes={a:[],b:[['Make Step 1 print one line per item: “item — label”',1],['Rewrite Step 2 from scratch',0],['Add 20 more data lists',0]],c:[]};
+  $('#h1ho').onchange=()=>{const v=$('#h1ho').value;$('#h1fix').innerHTML=(v&&fixes[v].length?fixes[v]:[['Make Step 1 print one line per item: “item — label”',1],['Rewrite Step 2 from scratch',0],['Add 20 more data lists',0]]).map((f,i)=>`<button class="opt" data-ok="${f[1]}">${esc(f[0])}</button>`).join('')};
+  $('#h1ho').onchange();
+  $('#h1fix').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;$$('#h1fix .opt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');R.fixpick=b.textContent});
+  $('#h1fixbtn').onclick=()=>{
+    const ho=$('#h1ho').value,sel=$('#h1fix .sel');
+    if(!ho||!sel){fbox('h1fb2','info','Choose the broken hand-off and one fix.');return}
+    if(ho!=='b'){fbox('h1fb2','bad','Not that one. Look at what Step 1 prints and what Step 2 expects to receive.');R.h1b=0;return}
+    if(sel.dataset.ok==='1'){fbox('h1fb2','good','Yes. The broken hand-off is Step 1 → Step 2. Fix that one connection first. Do not rebuild everything.');R.h1b=1}
+    else{fbox('h1fb2','bad','Right hand-off, but that fix is too big or does not touch the connection. Change only what makes the output usable as the next input.');R.h1b=0}
+  };
+  $('#h1copy').onclick=e=>copyText(`H1 Assemble the chain\nChain order correct: ${R.h1a??'not checked'} of 4 slots\nBroken hand-off found and fixed: ${R.h1b===1?'yes (Step 1 to Step 2)':'not yet'}`,e.target);
+}
+/* H2 */
+const T2=[
+{t:'Practice',i:'Practice list P3: milk (opened), 2 sandwiches, cooked rice, apples',o:'Keep: apples. Share today: 2 sandwiches, cooked rice. Bin: milk. Note drafted.',p:1,w:'Correct sort, no names, nothing invented.'},
+{t:'Practice',i:'Practice list P7: yoghurt, bread rolls, salad, fruit cups',o:'Keep: bread rolls. Share today: salad, fruit cups, yoghurt.',p:1,w:'Matches the answer key for P7.'},
+{t:'Edge · blank',i:'(blank list)',o:'Share today: 3 trays of cooked rice. Note drafted for the charity.',p:0,c:'Step 1 prompt',w:'It invented food from nothing. Step 1 needs an empty-input check and a fallback.'},
+{t:'Edge · very long',i:'A list with 40 items',o:'Sorted the first 25 items. The last 15 were dropped without a warning.',p:0,c:'Step 2 tool',w:'Step 2’s note limit cut the list and nothing told the user. A graceful system warns the user.'},
+{t:'Edge · wrong input',i:'???, ###, 12345',o:'Share today: ???, ###, 12345.',p:0,c:'Step 1 prompt',w:'Step 1 treated nonsense as food. It should flag input it does not recognise.'},
+{t:'Edge · misspelt',i:'bannana, ryce, yoghourt',o:'Keep: banana. Share today: rice, yoghurt.',p:1,w:'It handled misspellings gracefully. A passed edge case still goes in the log.'},
+{t:'Held-out',i:'Held-out list H2: cooked chicken (left out 5 hours), juice, bread',o:'Keep for tomorrow: cooked chicken. Share today: juice, bread.',p:0,c:'Step 1 prompt',w:'Unsafe: chicken left out for 5 hours must never be kept or shared. Your practice lists never showed this.'},
+{t:'Held-out',i:'Held-out list H5: carrots, pasta salad, rice pudding',o:'Keep: carrots. Share today: pasta salad, rice pudding.',p:1,w:'Matches the key for H5.'}];
+let h2i=0,h2pts=0,h2v=null,h2c=null;const h2log=[];
+function h2draw(){
+  if(h2i>=T2.length){$('#h2stage').innerHTML=`<div class="fb good">All 8 tests logged. Points: ${h2pts} of 12. ${h2pts>=10?'Edge Case Hunter badge earned!':'Re-read the “check” column to see what you missed.'}</div>`;$('#h2head').textContent='All tests done';$('#h2end').hidden=false;return}
+  const t=T2[h2i];$('#h2head').textContent=`Test ${h2i+1} of 8`;h2v=null;h2c=null;
+  $('#h2stage').innerHTML=`<p><span class="tag y">${t.t}</span></p><p><b>Input:</b> ${esc(t.i)}</p><div class="row"><button class="btn" id="h2run">Run the system</button></div><div id="h2out" hidden><div class="fb info"><b>Output:</b> ${esc(t.o)}</div><p class="lead" style="margin-top:10px">Does this output meet the criteria and governance rules?</p><div class="row"><button class="opt" data-v="1" style="width:auto">Yes, it meets them</button><button class="opt" data-v="0" style="width:auto">No, it fails</button></div><div id="h2comp" hidden><label class="lbl" for="h2sel">Which component should you change?</label><select id="h2sel"><option value="">Choose…</option><option>Data</option><option>Step 1 prompt</option><option>Step 2 tool</option><option>Output check</option></select></div><div class="row" style="margin-top:10px"><button class="btn go" id="h2log" disabled>Log it</button></div></div>`;
+  $('#h2run').onclick=()=>{$('#h2out').hidden=false;$('#h2run').disabled=true};
+}
+function init_h2(){
+  h2draw();
+  $('#h2stage').addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;h2v=+b.dataset.v;$$('#h2stage [data-v]').forEach(x=>x.classList.toggle('sel',x===b));$('#h2comp').hidden=h2v===1;$('#h2log').disabled=false});
+  $('#h2stage').addEventListener('change',e=>{if(e.target.id==='h2sel')h2c=e.target.value});
+  $('#h2stage').addEventListener('click',e=>{
+    if(e.target.id!=='h2log')return;const t=T2[h2i];
+    if(h2v===0&&!$('#h2sel').value){return}
+    let got=0,txt;const vOk=h2v===t.p;if(vOk)got++;
+    let cOk='';
+    if(t.p===0){ if(h2v===0){const c=$('#h2sel').value;if(c===t.c){got++;cOk='✔ '+c}else cOk='✘ '+c+' → '+t.c} else cOk='—'}
+    h2pts+=got;
+    h2log.push({n:h2i+1,t:t.t,o:t.o,said:h2v?'Meets':'Fails',comp:h2v===0?$('#h2sel').value:'—',chk:(vOk?'✔ ':'✘ ')+t.w+(cOk&&t.p===0?' ('+cOk+')':'')});
+    $('#h2pts').textContent='Points '+h2pts;
+    $('#h2log tbody').innerHTML=h2log.map(r=>`<tr><td>${r.n}</td><td>${esc(r.t)}</td><td>${esc(r.o)}</td><td>${r.said}</td><td>${esc(r.comp)}</td><td>${esc(r.chk)}</td></tr>`).join('');
+    h2i++;h2draw();
+  });
+  const F=[['If the list is empty, ask the user to enter a list. Never guess.',1],['If the list is empty, make up a typical list so the user is not disappointed.',0],['Ignore blank lists; they almost never happen.',0]];
+  $('#h2fall').innerHTML=F.map(f=>`<button class="opt" data-ok="${f[1]}">${esc(f[0])}</button>`).join('');
+  $('#h2fall').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;R.h2f=b.textContent;$$('#h2fall .opt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');fbox('h2fb',b.dataset.ok==='1'?'good':'bad',b.dataset.ok==='1'?'Graceful: it asks for input and never guesses. Add it to your log as the fix for the blank list.':'That is not graceful. A good fallback never guesses and tells the user what to do next.')});
+  $('#h2copy').onclick=e=>copyText('H2 Test bench\n'+h2log.map(r=>`${r.n}. ${r.t}: you said ${r.said}; component ${r.comp}`).join('\n')+`\nPoints ${h2pts} of 12\nFallback chosen: ${R.h2f||'not chosen'}`,e.target);
+}
+/* H3 */
+const NODES=['Data','Step 1','Step 2','Output'];
+const BASE=[1,1,1,0,1,0,1,1,0,1];
+const CH=[
+{k:'A',t:'Make Step 1 stricter: label only food items, one label each',reach:[1,2,3],res:[1,1,1,1,1,0,1,1,1,1],g:'ok',m:'Clean Step 1 output gave Step 2 cleaner input, so the note and the final share list improved. One change, a clear cause.'},
+{k:'B',t:'Add 5 more practice lists',reach:[0],res:BASE,g:'ok',m:'Practice results rise, but the held-out score did not move. You tuned on practice, not on the task.'},
+{k:'C',t:'Shorten the Step 2 note',reach:[2,3],res:BASE,g:'ok',m:'The note is easier to read, but accuracy did not change. A change can help users without helping accuracy. Measure what you claim.'},
+{k:'D',t:'Remove the food-safety rule from Step 1',reach:[1,2,3],res:[1,1,1,1,1,0,1,1,0,1],g:'bad',m:'Accuracy rose by 10 pp, but the change breaks a governance rule: unsafe food could be shared. A gain that breaks a rule is rejected.'},
+{k:'E',t:'Do A, B and C all at once',reach:[0,1,2,3],res:[1,1,1,1,1,0,1,1,1,1],g:'ok',m:'Accuracy rose, but you cannot tell which change helped. Change one component at a time.'}];
+let h3k=null,h3p=[];
+function chainHtml(hit){return NODES.map((n,i)=>(i?'<span class="arrow">→</span>':'')+`<div class="node ${hit&&hit.includes(i)?'hit':''}">${n}</div>`).join('')}
+function dots(a){return a.map((v,i)=>`<span class="${v?'':'x'}" title="List ${i+1}">${v?'✔':'✘'}</span>`).join('')}
+const sum=a=>a.reduce((x,y)=>x+y,0);
+function init_h3(){
+  $('#h3chain').innerHTML=chainHtml();$('#h3before').innerHTML=dots(BASE);
+  $('#h3opts').innerHTML=CH.map(c=>`<button class="opt" data-k="${c.k}"><b>${c.k}.</b> ${esc(c.t)}</button>`).join('');
+  $('#h3pred').innerHTML=NODES.map((n,i)=>`<label class="opt" style="width:auto;cursor:pointer"><input type="checkbox" data-n="${i}"> ${n}</label>`).join('');
+  const upd=()=>{$('#h3run').disabled=!h3k};
+  $('#h3opts').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;h3k=b.dataset.k;$$('#h3opts .opt').forEach(x=>x.classList.toggle('sel',x===b));$('#h3res').hidden=true;upd()});
+  $('#h3run').onclick=()=>{
+    const c=CH.find(x=>x.k===h3k);h3p=$$('#h3pred input:checked').map(x=>+x.dataset.n);
+    const after=sum(c.res)*10, gain=after-70;
+    $('#h3res').hidden=false;$('#h3chain2').innerHTML=chainHtml(c.reach);$('#h3after').innerHTML=dots(c.res);
+    $('#h3ra').textContent=after+'%';$('#h3rg').textContent=(gain>=0?'+':'')+gain+' pp';
+    const hit=c.reach.slice().sort().join()===h3p.slice().sort().join();
+    R.h3={k:c.k,after,gain,hit};
+    $('#h3fb').className='fb '+(c.g==='ok'?'info':'bad');
+    $('#h3fb').innerHTML=`<b>Your prediction: ${hit?'matches the trace ✔':'differs from the trace. The highlighted parts show where the change really travelled.'}</b><br>${c.m}`;
+  };
+  $('#h3copy').onclick=e=>copyText(R.h3?`H3 One change, traced\nChange ${R.h3.k}\nHeld-out accuracy before 7/10 = 70%, after ${R.h3.after/10}/10 = ${R.h3.after}%\nChange: ${R.h3.gain>=0?'+':''}${R.h3.gain} pp\nPrediction matched: ${R.h3.hit?'yes':'no'}`:'Run a change first.',e.target);
+}
+/* H4 */
+const V=[['Criterion','Version 1','Version 2'],['Accuracy on held-out lists (target 80% or more)','90% ✔','90% ✔'],['Edge cases handled (4 tests)','4 of 4 ✔','3 of 4 ✘ (blank list now fails)'],['No personal data in any input','Yes ✔','No ✘ (names used)'],['Human approves before sending','Yes ✔','Yes ✔']];
+const Q=[
+{q:'“How do you know it is not misleading anyone?”',o:[['It looks professional.',0],['I verified one claim against the school food-safety sheet and ran a risk check.',1],['It is really fast.',0],['My partner liked it.',0]]},
+{q:'“Why should we trust the 90%?”',o:[['It got 10 out of 10 on my practice lists.',0],['90 is a big number.',0],['I ran it on 10 held-out lists it had never seen.',1],['The AI said it was sure.',0]]},
+{q:'“What happens if someone enters a blank list?”',o:[['That never happens.',0],['I would fix it later.',0],['It guesses a list.',0],['I tested a blank list. It now asks the user to enter one, and it is in my log.',1]]}];
+let h4s=0;const h4d={};
+function init_h4(){
+  $('#h4tab').innerHTML=V.map((r,i)=>'<tr>'+r.map(c=>i?`<td>${esc(c)}</td>`:`<th>${esc(c)}</th>`).join('')+'</tr>').join('');
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-lock]');if(!b)return;R.lock=b.dataset.lock;$$('[data-lock]').forEach(x=>x.classList.toggle('sel',x===b));
+    fbox('h4fb',b.dataset.lock==='1'?'good':'bad',b.dataset.lock==='1'?'Lock Version 1. The last-minute feature broke an edge case and a privacy rule that Version 1 already passed. That is a regression. Never add an untested feature before a showcase.':'Version 2 regressed: a blank list fails again and names enter the data. Lock the version that passes every criterion.')});
+  $('#h4q').innerHTML=Q.map((q,i)=>`<div style="margin-bottom:12px"><b>Panel question ${i+1}:</b> ${esc(q.q)}<div class="opts" data-qi="${i}">${q.o.map(o=>`<button class="opt" data-ok="${o[1]}">${esc(o[0])}</button>`).join('')}</div></div>`).join('');
+  $('#h4q').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;const g=b.parentElement,i=+g.dataset.qi;if(h4d[i]!==undefined)return;h4d[i]=+b.dataset.ok;if(b.dataset.ok==='1')h4s++;$$('.opt',g).forEach(x=>{if(x.dataset.ok==='1')x.classList.add('good');else if(x===b)x.classList.add('wrong')});$('#h4sc').textContent='Defence '+h4s+' / 3'});
+  const chk=()=>{const t=$('#h4txt').value;const m={num:/\d/.test(t),chk:/verif|tested|checked|test/i.test(t),gov:/rule|privacy|human|risk|governance|approve/i.test(t),len:t.trim().split(/\s+/).filter(Boolean).length>=25};$$('#h4chk li').forEach(li=>li.classList.toggle('y',m[li.dataset.k]))};
+  $('#h4txt').addEventListener('input',chk);
+  $('#h4copy').onclick=e=>copyText(`H4 Lock and defend\nVersion locked: ${R.lock||'not chosen'}\nDefence questions correct: ${h4s} of 3\nMy defence: ${$('#h4txt').value||'(not written)'}`,e.target);
+}
+
+window.addEventListener('DOMContentLoaded',()=>show(location.hash.slice(1)||'h1',false));
+if(document.readyState!=='loading')show(location.hash.slice(1)||'h1',false);
+</script>
+
+</body></html>
